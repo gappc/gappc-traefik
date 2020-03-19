@@ -8,15 +8,17 @@ services:
   traefik:
     # The official v2 Traefik docker image
     image: traefik:v2.1
+    restart: always
     command:
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --providers.docker
-      - --api
-      - --certificatesresolvers.le.acme.email=gapp.christian+letsencrypt@gmail.com
-      - --certificatesresolvers.le.acme.storage=/acme.json
-      - --certificatesresolvers.le.acme.tlschallenge=true
-      - --certificatesresolvers.le.acme.caServer="https://acme-staging-v02.api.letsencrypt.org/directory"
+      # - "--log.level=DEBUG"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker"
+      - "--api"
+      - "--certificatesresolvers.letsencrypt.acme.email=gapp.christian+letsencrypt@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     ports:
       # The HTTP port
       - "80:80"
@@ -28,7 +30,7 @@ services:
       # Letsencrypt file
       - ./acme.json:/acme.json
       # Basic auth file for traefik dashboard authentication
-      - ./.htpasswd:/etc/.htpasswd
+      - ./.htpasswd:/.htpasswd
     labels:
       # Redirect all HTTP traffic to HTTPS
       - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
@@ -43,7 +45,8 @@ services:
       - "traefik.http.routers.api.entrypoints=websecure"
       - "traefik.http.routers.api.middlewares=auth"
       - "traefik.http.routers.api.tls"
-      - "traefik.http.middlewares.auth.basicauth.usersFile=/etc/.htpasswd"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.auth.basicauth.usersFile=/.htpasswd"
 
     networks:
       - web
