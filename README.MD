@@ -28,7 +28,13 @@ Change directory:
 cd gappc-net-traefik
 ```
 
-The next step is to make sure, that there is a `.htpasswd` file in this directory. This projects traefik configuration won't start without such a file!
+Change the permissions of the file `acme.json` to 600:
+
+```
+chmod 600 acme.json
+```
+
+Then make sure, that there is a `.htpasswd` file in this directory. This projects traefik configuration won't start without such a file!
 
 If don't have a `.htpasswd`, you can create one using the `htpassed` tool:
 
