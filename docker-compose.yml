@@ -1,0 +1,49 @@
+version: "3.1"
+
+networks:
+  web:
+    external: true
+
+services:
+  traefik:
+    # The official v2 Traefik docker image
+    image: traefik:v2.1
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker
+      - --api
+      - --certificatesresolvers.le.acme.email=gapp.christian+letsencrypt@gmail.com
+      - --certificatesresolvers.le.acme.storage=/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.caServer="https://acme-staging-v02.api.letsencrypt.org/directory"
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The HTTP port
+      - "443:443"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Letsencrypt file
+      - ./acme.json:/acme.json
+      # Basic auth file for traefik dashboard authentication
+      - ./.htpasswd:/etc/.htpasswd
+    labels:
+      # Redirect all HTTP traffic to HTTPS
+      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
+      - "traefik.http.routers.http_catchall.entrypoints=web"
+      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+
+      # Dashboard
+      - "traefik.http.routers.api.rule=Host(`traefik.gappc.net`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.middlewares=auth"
+      - "traefik.http.routers.api.tls"
+      - "traefik.http.middlewares.auth.basicauth.usersFile=/etc/.htpasswd"
+
+    networks:
+      - web
