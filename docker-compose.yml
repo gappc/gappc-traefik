@@ -9,16 +9,18 @@ services:
     # The official v2 Traefik docker image
     image: traefik:v2.2
     restart: always
+    env_file:
+      - namecheap.env
     command:
       # - "--log.level=DEBUG"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--providers.docker"
       - "--api"
+      ### letsencrypt ACME v2 (aka DNS-01 challenge) config
       - "--certificatesresolvers.letsencrypt.acme.email=gapp.christian+letsencrypt@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=namecheap"
     ports:
       # The HTTP port
       - "80:80"
@@ -50,3 +52,4 @@ services:
 
     networks:
       - web
+
