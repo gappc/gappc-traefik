@@ -1,13 +1,11 @@
-version: "3.7"
-
 networks:
   web:
     external: true
 
 services:
   traefik:
-    # The official v2 Traefik docker image
-    image: traefik:v2.2
+    # The official Traefik docker image
+    image: traefik:v3.3
     restart: always
     env_file:
       - namecheap.env
