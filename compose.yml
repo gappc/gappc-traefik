@@ -22,6 +22,7 @@ services:
       ### Auth plugin
       - "--experimental.plugins.traefik-oidc-auth.modulename=github.com/sevensolutions/traefik-oidc-auth"
       - "--experimental.plugins.traefik-oidc-auth.version=v0.13.0"
+      - "--serverstransport.insecureskipverify=true"
     ports:
       # The HTTP port
       - "80:80"

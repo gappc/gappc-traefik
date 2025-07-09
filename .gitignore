@@ -1,3 +1,4 @@
 .env
 .htpasswd
 namecheap.env
+.vscode/settings.json
