@@ -12,7 +12,11 @@ services:
     command:
       # - "--log.level=DEBUG"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
       - "--providers.docker"
       - "--api"
       ### letsencrypt ACME v2 (aka DNS-01 challenge) config
@@ -36,13 +40,6 @@ services:
       # Basic auth file for traefik dashboard authentication
       - ./.htpasswd:/.htpasswd
     labels:
-      # Redirect all HTTP traffic to HTTPS
-      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
-      - "traefik.http.routers.http_catchall.entrypoints=web"
-      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
-
       # Dashboard
       - "traefik.http.routers.api.rule=Host(`traefik.gappc.net`)"
       - "traefik.http.routers.api.service=api@internal"
