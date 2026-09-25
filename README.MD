@@ -28,11 +28,16 @@ Change directory:
 cd gappc-net-traefik
 ```
 
-Change the permissions of the file `acme.json` to 600:
+Create a state directory **outside** the checkout for Traefik's ACME files (account and
+certificate private keys) and point `.env` at it:
 
 ```
-chmod 600 acme.json
+install -d -m 700 ~/state/gappc-traefik
+echo "TRAEFIK_STATE_DIR=$HOME/state/gappc-traefik" > .env
 ```
+
+Traefik creates `acme.json` / `acme-alpn.json` there on first start. Compose refuses to start
+without `TRAEFIK_STATE_DIR`.
 
 Then make sure, that there is a `.htpasswd` file in this directory. This projects traefik configuration won't start without such a file!
 
@@ -49,3 +54,19 @@ docker-compose up
 ```
 
 Traekfik should have started, take a look at [https://traefik.gappc.net/](https://traefik.gappc.net/) and enjoy the dashboard :)
+
+## Security note: `acme.json` was published in this repository
+
+From 2025-11-20 (commit `aa86db7`) to 2026-09-26 this public repository contained a filled
+`acme.json`: the Let's Encrypt account key and the private keys of the certificates issued
+at that time. It had been tracked as an empty placeholder since 2020, and a routine commit
+swept in the live file.
+
+Treated as fully exposed, and made useless rather than hidden (the history is left as is):
+
+- **All 15 certificates in that file expired** between December 2025 and February 2026; none
+  of the certificates in use since then shares a key with them.
+- **The Let's Encrypt account (`acct/1111528107`) was deactivated** on 2026-09-26, so its key
+  can no longer revoke, order or change anything. Traefik registers a fresh account.
+- The ACME state moved out of the checkout (`TRAEFIK_STATE_DIR`) and `acme*.json*` is ignored,
+  so the mistake cannot repeat through this path.

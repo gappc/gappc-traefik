@@ -21,11 +21,11 @@ services:
       - "--api"
       ### letsencrypt ACME v2 (aka DNS-01 challenge) config
       - "--certificatesresolvers.letsencrypt.acme.email=gapp.christian+letsencrypt@gmail.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/state/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=namecheap"
       ### lynq.ing: TLS-ALPN-01 over :443 — no registrar credential, own ACME account
       - "--certificatesresolvers.le-alpn.acme.email=ops@lynq.ing"
-      - "--certificatesresolvers.le-alpn.acme.storage=/acme-alpn.json"
+      - "--certificatesresolvers.le-alpn.acme.storage=/state/acme-alpn.json"
       - "--certificatesresolvers.le-alpn.acme.tlschallenge=true"
       ### Auth plugin
       - "--experimental.plugins.traefik-oidc-auth.modulename=github.com/sevensolutions/traefik-oidc-auth"
@@ -39,9 +39,9 @@ services:
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
-      # Letsencrypt file
-      - ./acme.json:/acme.json
-      - ./acme-alpn.json:/acme-alpn.json
+      # ACME state (account keys + certificate keys) lives OUTSIDE this checkout,
+      # so no git command can ever pick it up. Set TRAEFIK_STATE_DIR in .env.
+      - ${TRAEFIK_STATE_DIR:?set TRAEFIK_STATE_DIR in .env, see README}:/state
       # Basic auth file for traefik dashboard authentication
       - ./.htpasswd:/.htpasswd
     labels:

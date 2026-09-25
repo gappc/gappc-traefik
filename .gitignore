@@ -2,4 +2,5 @@
 .htpasswd
 namecheap.env
 .vscode/settings.json
-acme-alpn.json
+# ACME state belongs in TRAEFIK_STATE_DIR; never commit it, backups included
+acme*.json*
