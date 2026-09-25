@@ -39,9 +39,9 @@ services:
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
-      # ACME state (account keys + certificate keys) lives OUTSIDE this checkout,
-      # so no git command can ever pick it up. Set TRAEFIK_STATE_DIR in .env.
-      - ${TRAEFIK_STATE_DIR:?set TRAEFIK_STATE_DIR in .env, see README}:/state
+      # ACME state (account keys + certificate keys): ./state, ignored by git.
+      # Never track anything in it — see the security note in the README.
+      - ${TRAEFIK_STATE_DIR:-./state}:/state
       # Basic auth file for traefik dashboard authentication
       - ./.htpasswd:/.htpasswd
     labels:

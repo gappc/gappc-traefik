@@ -2,5 +2,6 @@
 .htpasswd
 namecheap.env
 .vscode/settings.json
-# ACME state belongs in TRAEFIK_STATE_DIR; never commit it, backups included
+# ACME state (account + certificate private keys) — never commit, backups included
+/state/
 acme*.json*

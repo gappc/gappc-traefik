@@ -28,16 +28,15 @@ Change directory:
 cd gappc-net-traefik
 ```
 
-Create a state directory **outside** the checkout for Traefik's ACME files (account and
-certificate private keys) and point `.env` at it:
+Create the state directory for Traefik's ACME files (account and certificate private keys).
+It is ignored by git — never track anything in it:
 
 ```
-install -d -m 700 ~/state/gappc-traefik
-echo "TRAEFIK_STATE_DIR=$HOME/state/gappc-traefik" > .env
+install -d -m 700 state
 ```
 
-Traefik creates `acme.json` / `acme-alpn.json` there on first start. Compose refuses to start
-without `TRAEFIK_STATE_DIR`.
+Traefik creates `state/acme.json` / `state/acme-alpn.json` on first start. To keep the state
+elsewhere, set `TRAEFIK_STATE_DIR` in `.env`.
 
 Then make sure, that there is a `.htpasswd` file in this directory. This projects traefik configuration won't start without such a file!
 
@@ -68,5 +67,5 @@ Treated as fully exposed, and made useless rather than hidden (the history is le
   of the certificates in use since then shares a key with them.
 - **The Let's Encrypt account (`acct/1111528107`) was deactivated** on 2026-09-26, so its key
   can no longer revoke, order or change anything. Traefik registers a fresh account.
-- The ACME state moved out of the checkout (`TRAEFIK_STATE_DIR`) and `acme*.json*` is ignored,
-  so the mistake cannot repeat through this path.
+- The ACME state moved to `./state/`, which is ignored along with `acme*.json*` and is never
+  tracked — the placeholder-file trap that caused this no longer exists.
