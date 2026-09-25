@@ -2,3 +2,4 @@
 .htpasswd
 namecheap.env
 .vscode/settings.json
+acme-alpn.json

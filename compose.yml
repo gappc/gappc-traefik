@@ -23,6 +23,10 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.email=gapp.christian+letsencrypt@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=namecheap"
+      ### lynq.ing: TLS-ALPN-01 over :443 — no registrar credential, own ACME account
+      - "--certificatesresolvers.le-alpn.acme.email=ops@lynq.ing"
+      - "--certificatesresolvers.le-alpn.acme.storage=/acme-alpn.json"
+      - "--certificatesresolvers.le-alpn.acme.tlschallenge=true"
       ### Auth plugin
       - "--experimental.plugins.traefik-oidc-auth.modulename=github.com/sevensolutions/traefik-oidc-auth"
       - "--experimental.plugins.traefik-oidc-auth.version=v0.13.0"
@@ -37,6 +41,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Letsencrypt file
       - ./acme.json:/acme.json
+      - ./acme-alpn.json:/acme-alpn.json
       # Basic auth file for traefik dashboard authentication
       - ./.htpasswd:/.htpasswd
     labels:
